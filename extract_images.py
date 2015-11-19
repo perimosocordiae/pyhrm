@@ -1,8 +1,15 @@
+from __future__ import print_function
 import numpy as np
 import turtle
 from argparse import ArgumentParser
 from base64 import decodestring
 from zlib import decompress
+
+# Python 2/3 compat
+try:
+  _input = raw_input
+except NameError:
+  _input = input
 
 '''TODO:
  * add a matplotlib-based plotter
@@ -13,24 +20,25 @@ from zlib import decompress
 
 
 def parse_images(filepath):
-  lines = iter(open(filepath))
+  lines = open(filepath, 'rb')
   while True:
     # clever trick!
     # when next() raises StopIteration, it stops this generator too
     line = next(lines)
-    if not line.startswith('DEFINE '):
+    if not line.startswith(b'DEFINE '):
       continue
     _, kind, number = line.split()
+    kind = kind.decode('ascii')
     number = int(number)
-    raw_data = ''
-    while line[-1] != ';':
+    raw_data = b''
+    while not line.endswith(b';'):
       line = next(lines).strip()
       raw_data += line
     # strip ; terminator
     raw_data = raw_data[:-1]
     # add base64 padding
     if len(raw_data) % 4 != 0:
-      raw_data += '=' * (2 - (len(raw_data) % 2))
+      raw_data += b'=' * (2 - (len(raw_data) % 2))
     # decode base64 -> decode zlib -> convert to byte array
     data = np.fromstring(decompress(decodestring(raw_data)), dtype=np.uint8)
     assert data.shape == (1028,)
@@ -48,7 +56,7 @@ def main():
 
   for kind, number, path in parse_images(args.program):
     title = '%s #%d, path length %d' % (kind, number, path.shape[0])
-    print title
+    print(title)
     if not path.size:
       continue
     pen_up = (path==0).all(axis=1)
@@ -58,14 +66,14 @@ def main():
     turtle.speed(args.speed)
     turtle.setworldcoordinates(0, 655.36, 655.36, 0)
     turtle.pen(shown=False, pendown=False, pensize=10)
-    for i in xrange(path.shape[0]):
+    for i,pos in enumerate(path):
       if pen_up[i]:
         turtle.penup()
       else:
-        turtle.setpos(path[i])
+        turtle.setpos(pos)
         turtle.pendown()
         turtle.dot(size=10)
-    raw_input('Press enter to continue')
+    _input('Press enter to continue')
     turtle.clear()
   turtle.bye()
 

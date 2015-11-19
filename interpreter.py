@@ -9,7 +9,7 @@ def parse_hrm(filepath):
   for line in open(filepath):
     if line.startswith('    '):
       opcodes.append(line.strip().split())
-    elif line[1] == ':':
+    elif len(line) >= 2 and line[1] == ':':
       jumps[line[0]] = len(opcodes)
   return opcodes, jumps
 

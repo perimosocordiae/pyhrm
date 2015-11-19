@@ -41,5 +41,5 @@ python extract_images.py example_programs/sorter.hrm
 
 ### Dependencies
 
- * Python 2.7
+ * Python 2.7 or Python 3
  * numpy (for `extract_images.py` only)
