@@ -1,4 +1,5 @@
-**pyhrm** - *Tools for analyzing and running Human Resource Machine programs.*
+## pyhrm
+*Tools for analyzing and running Human Resource Machine programs.*
 
 [Human Resource Machine](http://tomorrowcorporation.com/humanresourcemachine)
 is a fun little game about programming, so naturally I felt compelled
@@ -8,7 +9,7 @@ To export a program from your game,
 use the in-game copy button then paste your program into a text editor.
 I've started using the file extension `.hrm`, but any plaintext file will do.
 
-##  Usage
+###  Usage
 
 All scripts support the `--help` option,
 which will display all the optional and required arguments.
@@ -34,3 +35,8 @@ python interpreter.py --initmem 24 0 --memsize 25 example_programs/sorter.hrm 3 
 # Extract images from the sorter program, animating them in a Tk window.
 python extract_images.py example_programs/sorter.hrm
 ```
+
+### Dependencies
+
+ * Python 2.7
+ * numpy (for `extract_images.py` only)
