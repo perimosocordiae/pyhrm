@@ -18,15 +18,18 @@ which will display all the optional and required arguments.
 
 ```bash
 # Run the sorter program, with 25 memory cells and a zero in the last cell.
-python interpreter.py --initmem 24 0 --memsize 25 example_programs/sorter.hrm 3 7 2 0 H E L L O 0
->> 2
->> 3
->> 7
->> E
->> H
->> L
->> L
->> O
+# By default, inbox values are given on stdin, one per line
+python interpreter.py --initmem 24 0 --memsize 25 example_programs/sorter.hrm <<EOF
+3
+7
+2
+6
+0
+EOF
+2
+3
+6
+7
 ```
 
 **`extract_images.py`**: Displays the embedded images from a program.

@@ -1,3 +1,5 @@
+from __future__ import print_function
+import sys
 from argparse import ArgumentParser
 
 
@@ -33,16 +35,19 @@ def run_program(opcodes, jumps, memory, inbox, verbose=False):
   while True:
     inst = opcodes[ip]
     if verbose:
-      print ' '.join('%d:%s' % (i,x) for i,x in enumerate(memory)
-                     if x is not None)
-      print ip, hand, inst
+      memstr = ' '.join('%d:%s' % (i,x) for i,x in enumerate(memory)
+                        if x is not None)
+      print('DEBUG:', memstr)
+      print('DEBUG:', ip, hand, inst)
     op = inst[0]
     if op == 'INBOX':
-      if not inbox:
-        return
-      hand = inbox.pop()
+      val = next(inbox).strip()
+      if len(val) == 1 and val.isalpha():
+        hand = val.upper()
+      else:
+        hand = int(val)
     elif op == 'OUTBOX':
-      print '>>', hand
+      yield hand
       hand = None
     elif op == 'COPYFROM':
       hand = memory[dereference(inst[1], memory)]
@@ -77,7 +82,7 @@ def run_program(opcodes, jumps, memory, inbox, verbose=False):
         ip = jumps[inst[1]]
         continue
     elif op != 'COMMENT':
-      raise ValueError('Operation NYI:', op)
+      raise ValueError('Invalid operation:', op)
     ip += 1
 
 
@@ -88,16 +93,18 @@ def main():
                   help='size of memory (floor), default = %(default)s')
   ap.add_argument('--initmem', nargs='*', default=[],
                   help='pairs of [index value] to initialize memory with')
+  ap.add_argument('--inbox', type=open, default=sys.stdin,
+                  help='File of inbox values, one per line, default = stdin')
   ap.add_argument('program')
-  ap.add_argument('inbox', nargs='+', help='space-separated inbox values')
   args = ap.parse_args()
   if len(args.initmem) % 2 != 0:
     ap.error('Must provide pairs to --initmem')
 
   memory = initialize_memory(args.memsize, args.initmem)
   opcodes, jumps = parse_hrm(args.program)
-  inbox = [int(x) if x.isdigit() else x.upper() for x in args.inbox[::-1]]
-  run_program(opcodes, jumps, memory, inbox, verbose=args.verbose)
+  for out in run_program(opcodes, jumps, memory, args.inbox,
+                         verbose=args.verbose):
+    print(out)
 
 
 if __name__ == '__main__':
